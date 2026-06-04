@@ -2,7 +2,6 @@
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
 import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
-import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_checkout_com_suppression.dart';
 
@@ -54,57 +53,73 @@ Future<T> tracedCheckoutCom<T>({
   final t = tracer ?? OTel.tracerProvider().getTracer('otel_checkout_com');
   final span = t.startSpan('checkoutcom $operation', kind: SpanKind.client);
   try {
-    span.setStringAttribute('rpc.system', 'checkout_com');
+    span.addAttributes(
+        OTel.attributes([OTel.attributeString('rpc.system', 'checkout_com')]));
     final r = await invoke();
     final res = r.result;
     if (res != null) {
       if (res.processingChannelId != null) {
-        span.setStringAttribute(
-          'checkoutcom.processing_channel.id',
-          res.processingChannelId!,
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            'checkoutcom.processing_channel.id',
+            res.processingChannelId!,
+          )
+        ]));
       }
       if (res.paymentId != null) {
-        span.setStringAttribute('checkoutcom.payment.id', res.paymentId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('checkoutcom.payment.id', res.paymentId!)]));
       }
       if (res.paymentMethod != null) {
-        span.setStringAttribute(
-          'checkoutcom.payment_method',
-          res.paymentMethod!,
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            'checkoutcom.payment_method',
+            res.paymentMethod!,
+          )
+        ]));
       }
       if (res.scheme != null) {
-        span.setStringAttribute('checkoutcom.scheme', res.scheme!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('checkoutcom.scheme', res.scheme!)]));
       }
       if (res.amount != null) {
-        span.setDoubleAttribute('checkoutcom.amount', res.amount!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeDouble('checkoutcom.amount', res.amount!)]));
       }
       if (res.currency != null) {
-        span.setStringAttribute('checkoutcom.currency', res.currency!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('checkoutcom.currency', res.currency!)]));
       }
       if (res.status != null) {
-        span.setStringAttribute('checkoutcom.status', res.status!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('checkoutcom.status', res.status!)]));
       }
       if (res.responseCode != null) {
-        span.setStringAttribute('checkoutcom.response_code', res.responseCode!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('checkoutcom.response_code', res.responseCode!)
+        ]));
       }
       if (res.threeDS != null) {
-        span.setBoolAttribute('checkoutcom.three_ds', res.threeDS!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeBool('checkoutcom.three_ds', res.threeDS!)]));
       }
       if (res.statusCode != null) {
-        span.setIntAttribute('http.response.status_code', res.statusCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('http.response.status_code', res.statusCode!)]));
       }
       if (res.errorCode != null) {
-        span.setStringAttribute('checkoutcom.error.code', res.errorCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('checkoutcom.error.code', res.errorCode!)]));
       }
-      final fail =
-          res.errorCode != null ||
+      final fail = res.errorCode != null ||
           (res.statusCode != null && res.statusCode! >= 400);
       if (fail) {
-        span.setStringAttribute(
-          ErrorResource.errorType.key,
-          res.errorCode ?? 'checkout_com.error',
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            ErrorResource.errorType.key,
+            res.errorCode ?? 'checkout_com.error',
+          )
+        ]));
         span.setStatus(SpanStatusCode.Error, res.errorMessage);
       }
     }
